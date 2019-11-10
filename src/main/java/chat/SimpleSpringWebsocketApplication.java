@@ -1,4 +1,4 @@
-package hello;
+package chat;
 
 
 import org.springframework.boot.SpringApplication;

@@ -1,4 +1,4 @@
-package hello;
+package chat.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     // @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/gs-guide-websocket")
-        .setAllowedOrigins("http://localhost:8081",
+        .setAllowedOrigins("http://localhost:8082",
                 "chrome-extension://ggnhohnkfcpcanfekomdkjffnfcjnjam")
         .withSockJS();
     }
