@@ -31,25 +31,29 @@ public class SysMessagesController {
 	
 	private String convertUsersToString() {
 		String converted = "";
-		for (User connectedUser : connectedUsers) {
+		for (User connectedUser : this.connectedUsers) {
 			converted += connectedUser.getName() + "&\\&" + connectedUser.getStatus() + "&7&";
 		}
 		return converted;
 	}
 	
-	private boolean checkUserNameUniq(String userName) {
+	private int findUser(String userName) {
 		
 		for (int i = 0; i < connectedUsers.size(); i++)
 		{
-			if (connectedUsers.get(i).getName() == userName) {
-				return false;
+			User user = connectedUsers.get(i);
+			logger.info(user.getName());
+			logger.info("Compare result: " + userName.contentEquals(user.getName()));
+			if (userName.contentEquals(user.getName())) {
+				logger.info("Found " + i);
+				return i;
 			}
 		}
-		return true;
+		return -1;
 	}
 	
 	private String historyArrayToString (Message[] historyMessages) {
-		return "String";
+		return "String&7&";
 	}
 	
 	@MessageMapping("/system")
@@ -58,10 +62,10 @@ public class SysMessagesController {
 		
 		String sessionId = headerAccessor.getSessionId();
 		headerAccessor.setLeaveMutable(true);
-		
+		logger.info("User " + incomeMessage.getUser());
 		if (incomeMessage.getType() == MessageType.JOIN) {
 			
-			if (checkUserNameUniq(incomeMessage.getUser())) {
+			if (findUser(incomeMessage.getUser()) == -1) {
 			
 				logger.info("Join " + sessionId);
 				headerAccessor.getSessionAttributes().put("username", incomeMessage.getUser());
@@ -84,6 +88,8 @@ public class SysMessagesController {
 				incomeMessage.setContent("User already in chat! Try other nickname.");
 				messagingTemplate.convertAndSendToUser(sessionId, "/topic/system", incomeMessage, headerAccessor.getMessageHeaders());
 				
+				
+				
 			}
 			
 		} else if (incomeMessage.getType() == MessageType.HISTORY) {
@@ -92,6 +98,17 @@ public class SysMessagesController {
 			String historyContent = historyArrayToString(historyArray);
 			incomeMessage.setContent(historyContent);
 			messagingTemplate.convertAndSendToUser(sessionId, "/topic/system", incomeMessage, headerAccessor.getMessageHeaders());
+			
+		} else if (incomeMessage.getType() == MessageType.STATUS) {
+			
+			int index = findUser(incomeMessage.getUser());
+			connectedUsers.get(index).setStatus(incomeMessage.getContent());
+			messagingTemplate.convertAndSend("/topic/public", incomeMessage, headerAccessor.getMessageHeaders());
+			
+		} else if (incomeMessage.getType() == MessageType.LEAVE) {
+			logger.info("Leave " + incomeMessage.getUser());
+			int index = findUser(incomeMessage.getUser());
+			connectedUsers.remove(index);
 		}
 		
 	}

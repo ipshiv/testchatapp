@@ -22,7 +22,7 @@ public class ChatMessagesController {
 	public Message chatMessage(@Payload Message incomeMessage,
 			SimpMessageHeaderAccessor headerAccessor) {
 		
-		incomeMessage.setId(headerAccessor.getSessionId());
+		incomeMessage.setId(headerAccessor.getMessageHeaders().get("message-id").toString());
 		dbHandler.saveData(incomeMessage);
 		return incomeMessage;
 		

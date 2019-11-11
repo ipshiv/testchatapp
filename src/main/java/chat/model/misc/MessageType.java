@@ -7,6 +7,7 @@ public enum MessageType {
 	STATUS,
 	ROOM,
 	ERROR,
+	SERVER,
 	JOIN,
 	LEAVE
 
