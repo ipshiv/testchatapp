@@ -33,12 +33,13 @@ public class WebSocketEventListener {
         String username = (String) headerAccessor.getSessionAttributes().get("username");
         if(username != null) {
             logger.info("User Disconnected : " + username);
-
+            
             Message chatMessage = new Message();
             chatMessage.setType(MessageType.LEAVE);
             chatMessage.setUser(username);
-
+            
             messagingTemplate.convertAndSend("/topic/public", chatMessage);
+            messagingTemplate.convertAndSend("/app/system", chatMessage);
         }
     }
 
